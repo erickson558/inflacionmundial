@@ -21,6 +21,7 @@ La app cubre cuatro escenarios:
 - Modo oscuro por defecto con cambio manual a modo claro.
 - Interfaz responsiva en una sola página.
 - Guía visual simple para que cualquier persona entienda el flujo.
+- Animaciones y efectos visuales para reforzar los resultados y la navegación.
 - `VERSION` como fuente única de verdad para la versión de la app.
 - Release automático en GitHub al hacer push a `main`.
 

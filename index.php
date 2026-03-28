@@ -86,6 +86,7 @@ function collect_country_codes(array $countries)
 
 $service = new InflationService(new WorldBankClient(__DIR__ . '/data'));
 $version = current_version(__DIR__ . '/VERSION');
+$assetVersion = rawurlencode($version);
 $countries = $service->getCountries();
 $countryCodes = collect_country_codes($countries);
 $selectedCountry = strtoupper((string) request_value('country', 'GTM'));
@@ -158,6 +159,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
     <script>
         (function () {
             var theme = 'dark';
+            document.documentElement.className += document.documentElement.className ? ' has-js' : 'has-js';
             try {
                 var savedTheme = window.localStorage ? localStorage.getItem('inflacionmundial-theme') : null;
                 if (savedTheme === 'light' || savedTheme === 'dark') {
@@ -169,11 +171,11 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
             document.documentElement.setAttribute('data-theme', theme);
         }());
     </script>
-    <link rel="stylesheet" href="assets/styles.css">
+    <link rel="stylesheet" href="assets/styles.css?v=<?= h($assetVersion) ?>">
 </head>
 <body data-active-calculator="<?= h($activeCalculator) ?>">
 <main class="shell">
-    <section class="topbar" data-reveal="1">
+    <section class="topbar" data-reveal="1" style="--reveal-order: 1;">
         <div class="topbar-copy">
             <p class="eyebrow eyebrow-inline">InflacionMundial <?= h($version) ?></p>
             <p class="topbar-note">Modo oscuro por defecto, con opción clara y cálculos guiados paso a paso.</p>
@@ -184,7 +186,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
         </button>
     </section>
 
-    <section class="hero" data-reveal="2">
+    <section class="hero" data-reveal="2" style="--reveal-order: 2;">
         <div class="hero-copy">
             <p class="hero-tag">Calculadora simple para cualquier persona</p>
             <h1>Calculadora de inflación y precios por país</h1>
@@ -238,7 +240,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
         </div>
     </section>
 
-    <section id="quick-start" class="steps-panel" data-reveal="3">
+    <section id="quick-start" class="steps-panel" data-reveal="3" style="--reveal-order: 3;">
         <article class="step-card">
             <span class="step-index">1</span>
             <h2>Elige el país</h2>
@@ -257,7 +259,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
     </section>
 
     <?php if (!empty($errors)): ?>
-        <section class="alert" data-reveal="4">
+        <section class="alert" data-reveal="4" style="--reveal-order: 4;">
             <strong>No se pudo completar el cálculo.</strong>
             <ul>
                 <?php foreach ($errors as $error): ?>
@@ -267,14 +269,14 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
         </section>
     <?php endif; ?>
 
-    <section class="jump-links" data-reveal="5">
+    <section class="jump-links" data-reveal="5" style="--reveal-order: 5;">
         <a href="#calc-1">Quiero saber la inflación futura acumulada</a>
         <a href="#calc-2">Quiero actualizar un precio viejo</a>
         <a href="#calc-3">Quiero ver la inflación de un año futuro</a>
         <a href="#calc-4">Quiero proyectar un precio futuro</a>
     </section>
 
-    <section class="info-panel" data-reveal="6">
+    <section class="info-panel" data-reveal="6" style="--reveal-order: 6;">
         <h2>Cómo interpreta la app los datos</h2>
         <p>
             "Precio actual" significa el equivalente al <strong>último año con CPI disponible</strong>, no
@@ -285,7 +287,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
     </section>
 
     <section class="calculator-grid">
-        <article id="calc-1" class="calculator-card <?= $activeCalculator === 'future_accumulated' ? 'is-active' : '' ?>" data-reveal="7">
+        <article id="calc-1" class="calculator-card <?= $activeCalculator === 'future_accumulated' ? 'is-active' : '' ?>" data-reveal="7" style="--reveal-order: 7;">
             <div class="card-head">
                 <p class="section-kicker">Tema 1</p>
                 <h2>Calcular la inflación futura acumulada</h2>
@@ -326,7 +328,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
             <?php endif; ?>
         </article>
 
-        <article id="calc-2" class="calculator-card <?= $activeCalculator === 'current_price' ? 'is-active' : '' ?>" data-reveal="8">
+        <article id="calc-2" class="calculator-card <?= $activeCalculator === 'current_price' ? 'is-active' : '' ?>" data-reveal="8" style="--reveal-order: 8;">
             <div class="card-head">
                 <p class="section-kicker">Tema 2</p>
                 <h2>Calcular el precio actual de un producto</h2>
@@ -375,7 +377,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
             <?php endif; ?>
         </article>
 
-        <article id="calc-3" class="calculator-card <?= $activeCalculator === 'future_year_inflation' ? 'is-active' : '' ?>" data-reveal="9">
+        <article id="calc-3" class="calculator-card <?= $activeCalculator === 'future_year_inflation' ? 'is-active' : '' ?>" data-reveal="9" style="--reveal-order: 9;">
             <div class="card-head">
                 <p class="section-kicker">Tema 3</p>
                 <h2>Calcular la inflación en otro año futuro</h2>
@@ -415,7 +417,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
             <?php endif; ?>
         </article>
 
-        <article id="calc-4" class="calculator-card <?= $activeCalculator === 'future_price' ? 'is-active' : '' ?>" data-reveal="10">
+        <article id="calc-4" class="calculator-card <?= $activeCalculator === 'future_price' ? 'is-active' : '' ?>" data-reveal="10" style="--reveal-order: 10;">
             <div class="card-head">
                 <p class="section-kicker">Tema 4</p>
                 <h2>Calcular el precio futuro de un producto</h2>
@@ -472,6 +474,6 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
         <p>Versión activa: <?= h($version) ?>.</p>
     </footer>
 </main>
-<script src="assets/app.js"></script>
+<script src="assets/app.js?v=<?= h($assetVersion) ?>"></script>
 </body>
 </html>

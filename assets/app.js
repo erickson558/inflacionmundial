@@ -46,11 +46,14 @@
 
         for (index = 0; index < revealItems.length; index++) {
             (function (position) {
+                if (revealItems[position]) {
+                    revealItems[position].style.transitionDelay = (position * 120) + 'ms';
+                }
                 window.setTimeout(function () {
                     if (revealItems[position]) {
                         revealItems[position].className += revealItems[position].className.indexOf('is-visible') === -1 ? ' is-visible' : '';
                     }
-                }, position * 80);
+                }, 140 + (position * 120));
             }(index));
         }
     }

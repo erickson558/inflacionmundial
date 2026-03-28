@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.1 - 2026-03-28
+
+- Animaciones y efectos visuales más notorios en botones, tarjetas y resultados.
+- Entrada escalonada más visible para las secciones principales.
+- Cache-busting en `styles.css` y `app.js` usando la versión actual para forzar recarga del navegador.
+
 ## v1.1.0 - 2026-03-28
 
 - Tema oscuro por defecto con cambio manual a modo claro y persistencia en el navegador.
