@@ -1,0 +1,9 @@
+# Changelog
+
+## v1.0.0 - 2026-03-28
+
+- Lanzamiento inicial del sitio PHP.
+- Calculadoras para inflación futura, inflación anual futura, precio actual y precio futuro.
+- Integración con snapshot del Banco Mundial para compatibilidad con EasyPHP / PHP 5.4.
+- Versionado centralizado en `VERSION`.
+- Workflow de GitHub Actions para crear releases automáticos en `main`.
