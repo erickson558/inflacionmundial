@@ -159,7 +159,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
     <meta name="description" content="Calculadora PHP para estimar inflación y precios por país usando datos del Banco Mundial.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:wght@400;500;600;700&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
     <script>
         (function () {
             var theme = 'dark';
@@ -181,7 +181,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
 <main class="shell">
     <section class="topbar" data-reveal="1" style="--reveal-order: 1;">
         <div class="topbar-copy">
-            <p class="eyebrow eyebrow-inline">InflacionMundial <?= h($version) ?></p>
+            <p class="eyebrow eyebrow-inline">InflacionMundial <span class="version-chip"><?= h($version) ?></span></p>
             <p class="topbar-note">Modo oscuro por defecto, con opción clara y cálculos guiados paso a paso.</p>
         </div>
         <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="true">
@@ -192,8 +192,15 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
 
     <section class="hero" data-reveal="2" style="--reveal-order: 2;">
         <div class="hero-copy">
-            <p class="hero-tag">Calculadora simple para cualquier persona</p>
-            <h1>Calculadora de inflación y precios por país</h1>
+            <p class="hero-tag">Archivo económico para cualquier persona</p>
+            <h1 class="hero-title">
+                <span class="hero-word">Calculadora</span>
+                <span class="hero-word hero-word-mark">de inflación</span>
+                <span class="hero-word">y precios</span>
+                <span class="hero-word">por país</span>
+            </h1>
+            <p class="hero-subtitle">Inspirada en vitrales, piedra oscura y señalización simple para que cualquier persona la entienda.</p>
+            <div class="hero-divider" aria-hidden="true"><span>✠</span></div>
             <p class="lead">
                 Elige un país, selecciona lo que quieres saber y escribe uno o dos datos. La app hace el resto
                 con información histórica del Banco Mundial.

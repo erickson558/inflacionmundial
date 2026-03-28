@@ -18,8 +18,8 @@ La app cubre cuatro escenarios:
 
 - Selector de países con snapshot local y series suficientes para calcular.
 - Snapshot local versionado en `data/` para que funcione incluso en PHP 5.4.
-- Modo oscuro por defecto con cambio manual a modo claro y estética gótica sobria.
-- Tipografías ornamentales en modo oscuro para reforzar la identidad visual.
+- Modo oscuro por defecto con cambio manual a modo claro y una dirección visual de catedral gótica.
+- Tipografías ornamentales, divisores heráldicos y paneles con remates marcados en modo oscuro.
 - Interfaz responsiva en una sola página.
 - Guía visual simple para que cualquier persona entienda el flujo.
 - Animaciones y efectos visuales para reforzar los resultados y la navegación.
@@ -31,7 +31,7 @@ La app cubre cuatro escenarios:
 - PHP 5.4 o superior.
 - Extensión `json`.
 - PowerShell con acceso saliente a internet para regenerar el snapshot del Banco Mundial cuando quieras actualizar datos.
-- Google Fonts para el modo oscuro ornamental, con fallback local si el navegador no puede cargarlas.
+- Google Fonts para el modo oscuro ornamental (`Cinzel Decorative`, `Cormorant Garamond`, `UnifrakturCook`), con fallback local si el navegador no puede cargarlas.
 - Git y GitHub CLI (`gh`) para publicar el proyecto.
 
 ## Estructura
@@ -87,7 +87,7 @@ Ese script descarga de nuevo:
 
 El proyecto usa SemVer con prefijo `vX.Y.Z`.
 
-- `major`: cambios incompatibles o rediseños grandes.
+- `major`: cambios incompatibles.
 - `minor`: nuevas funciones compatibles.
 - `patch`: correcciones o ajustes menores.
 

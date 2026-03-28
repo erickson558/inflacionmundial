@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.0 - 2026-03-28
+
+- Rediseño más fuerte del modo oscuro hacia una estética de catedral con vitrales, marcos angulares y fondo arquitectónico.
+- Hero reconstruido con composición en varias líneas y un acento blackletter visible para que el tono gótico se note desde el primer bloque.
+- Botones, tarjetas y paneles ajustados para sentirse menos SaaS y más heráldicos sin complicar el uso de la app.
+
 ## v1.3.0 - 2026-03-28
 
 - Rediseño más marcado del modo oscuro hacia una estética gótica sobria, menos vino y más piedra/obsidiana.
