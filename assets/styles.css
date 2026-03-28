@@ -1,32 +1,32 @@
 :root {
     color-scheme: dark;
-    --font-body: "Trebuchet MS", Verdana, sans-serif;
-    --font-display: "Palatino Linotype", "Book Antiqua", Georgia, serif;
-    --bg: #080407;
-    --bg-strong: #15070c;
-    --bg-soft: #25111a;
-    --surface: rgba(18, 8, 12, 0.86);
-    --surface-strong: rgba(26, 12, 17, 0.96);
-    --surface-soft: rgba(208, 174, 117, 0.06);
-    --ink: #f4ebde;
-    --ink-soft: #cfb9a7;
-    --ink-mute: #9f8476;
-    --accent: #8f2436;
-    --accent-strong: #d0ae75;
-    --accent-soft: rgba(143, 36, 54, 0.2);
+    --font-body: "Cormorant Garamond", Georgia, serif;
+    --font-display: "Cinzel", "Times New Roman", serif;
+    --bg: #050507;
+    --bg-strong: #0c0c10;
+    --bg-soft: #17171d;
+    --surface: rgba(11, 11, 15, 0.88);
+    --surface-strong: rgba(19, 19, 24, 0.96);
+    --surface-soft: rgba(201, 184, 144, 0.05);
+    --ink: #f3eee3;
+    --ink-soft: #c9c0af;
+    --ink-mute: #968b79;
+    --accent: #6c624f;
+    --accent-strong: #d0c09a;
+    --accent-soft: rgba(208, 192, 154, 0.12);
     --success: #89c79f;
-    --danger: #dc7668;
-    --line: rgba(208, 174, 117, 0.14);
-    --line-strong: rgba(208, 174, 117, 0.34);
-    --button-start: #4f1020;
-    --button-end: #8f2436;
-    --button-glow: rgba(143, 36, 54, 0.28);
-    --hero-glow: rgba(143, 36, 54, 0.28);
-    --mist-glow: rgba(208, 174, 117, 0.12);
-    --veil-line: rgba(208, 174, 117, 0.04);
-    --panel-highlight: rgba(208, 174, 117, 0.04);
-    --headline-shadow: 0 8px 26px rgba(0, 0, 0, 0.42);
-    --shadow: 0 28px 90px rgba(0, 0, 0, 0.5);
+    --danger: #d77967;
+    --line: rgba(208, 192, 154, 0.14);
+    --line-strong: rgba(208, 192, 154, 0.34);
+    --button-start: #2f2a25;
+    --button-end: #675b49;
+    --button-glow: rgba(70, 60, 46, 0.34);
+    --hero-glow: rgba(201, 184, 144, 0.1);
+    --mist-glow: rgba(112, 119, 137, 0.1);
+    --veil-line: rgba(208, 192, 154, 0.03);
+    --panel-highlight: rgba(208, 192, 154, 0.035);
+    --headline-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+    --shadow: 0 30px 90px rgba(0, 0, 0, 0.52);
     --shadow-soft: 0 20px 44px rgba(0, 0, 0, 0.3);
 }
 
@@ -79,7 +79,8 @@ body {
         radial-gradient(circle at 18% 0%, var(--hero-glow), transparent 26%),
         radial-gradient(circle at 82% 100%, var(--mist-glow), transparent 24%),
         repeating-linear-gradient(90deg, var(--veil-line) 0, var(--veil-line) 1px, transparent 1px, transparent 118px),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 28%),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0%, transparent 40%, rgba(255, 255, 255, 0.01) 100%),
         linear-gradient(180deg, var(--bg) 0%, var(--bg-strong) 100%);
     transition: background 0.35s ease, color 0.35s ease;
     position: relative;
@@ -91,7 +92,7 @@ body::after {
     content: "";
     position: fixed;
     z-index: 0;
-    border-radius: 999px;
+    border-radius: 50%;
     filter: blur(70px);
     opacity: 0.34;
     pointer-events: none;
@@ -169,11 +170,14 @@ a {
 .jump-links,
 .footer {
     border: 1px solid var(--line);
-    border-radius: 26px;
+    border-radius: 12px;
     background:
         linear-gradient(180deg, var(--panel-highlight), transparent 42%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.01), transparent 55%),
         var(--surface);
-    box-shadow: var(--shadow);
+    box-shadow:
+        inset 0 0 0 1px rgba(208, 192, 154, 0.04),
+        var(--shadow);
     backdrop-filter: blur(14px);
 }
 
@@ -191,6 +195,18 @@ a {
         box-shadow 0.35s ease,
         border-color 0.35s ease,
         background-color 0.35s ease;
+}
+
+.topbar,
+.info-panel,
+.alert,
+.jump-links,
+.footer,
+.stat-card,
+.step-card,
+.jump-links a {
+    position: relative;
+    overflow: hidden;
 }
 
 .topbar {
@@ -212,9 +228,10 @@ a {
 .hero-tag {
     margin: 0;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    font-size: 0.82rem;
     color: var(--accent-strong);
+    font-family: var(--font-display);
 }
 
 .eyebrow-inline {
@@ -225,6 +242,7 @@ a {
     margin: 0;
     color: var(--ink-soft);
     line-height: 1.5;
+    font-size: 1.08rem;
 }
 
 .theme-toggle {
@@ -235,7 +253,7 @@ a {
     gap: 2px;
     min-width: 190px;
     padding: 12px 16px;
-    border-radius: 16px;
+    border-radius: 10px;
     border: 1px solid var(--line-strong);
     background: linear-gradient(145deg, var(--surface-strong), var(--surface-soft));
     color: var(--ink);
@@ -280,6 +298,17 @@ a {
     opacity: 0.95;
 }
 
+.topbar::before,
+.hero::before,
+.steps-panel::before,
+.info-panel::before,
+.calculator-card::before,
+.jump-links::before,
+.footer::before,
+.alert::before {
+    box-shadow: 0 0 0 1px rgba(208, 192, 154, 0.12);
+}
+
 .hero::after,
 .calculator-card::after {
     content: "";
@@ -314,6 +343,7 @@ a {
 .step-card p {
     color: var(--ink-soft);
     line-height: 1.65;
+    font-size: 1.14rem;
 }
 
 .hero-actions {
@@ -326,10 +356,12 @@ a {
 .secondary-link {
     text-decoration: none;
     padding: 12px 16px;
-    border-radius: 999px;
+    border-radius: 8px;
     border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.015);
     font-weight: 700;
+    font-family: var(--font-display);
+    letter-spacing: 0.05em;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
@@ -341,13 +373,13 @@ a {
 
 .secondary-link-strong {
     background: linear-gradient(135deg, var(--button-start), var(--button-end));
-    color: #fff7f1;
+    color: #f8f1e4;
     border-color: transparent;
 }
 
 .country-selector {
     padding: 18px;
-    border-radius: 20px;
+    border-radius: 10px;
     background: var(--surface-soft);
     border: 1px solid var(--line);
 }
@@ -358,6 +390,8 @@ a {
     margin-bottom: 8px;
     font-weight: 700;
     color: var(--ink);
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
 }
 
 .inline-form {
@@ -370,7 +404,7 @@ select,
 input,
 button {
     width: 100%;
-    border-radius: 14px;
+    border-radius: 8px;
     padding: 13px 14px;
     font: inherit;
 }
@@ -380,7 +414,9 @@ input {
     border: 1px solid var(--line);
     background: var(--surface-strong);
     color: var(--ink);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        inset 0 0 0 1px rgba(208, 192, 154, 0.02);
 }
 
 select::placeholder,
@@ -399,6 +435,9 @@ button {
     box-shadow: 0 16px 28px var(--button-glow);
     position: relative;
     overflow: hidden;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: var(--font-display);
 }
 
 button:hover {
@@ -427,7 +466,7 @@ button::after {
 
 .stat-card {
     padding: 16px;
-    border-radius: 20px;
+    border-radius: 10px;
     background: linear-gradient(180deg, var(--panel-highlight), transparent);
     border: 1px solid var(--line);
     box-shadow: var(--shadow-soft);
@@ -469,7 +508,7 @@ button::after {
 
 .step-card {
     padding: 18px;
-    border-radius: 20px;
+    border-radius: 10px;
     background: linear-gradient(180deg, var(--panel-highlight), transparent);
     border: 1px solid var(--line);
 }
@@ -481,10 +520,11 @@ button::after {
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: var(--accent-soft);
+    background: linear-gradient(180deg, rgba(208, 192, 154, 0.16), rgba(255, 255, 255, 0.03));
     color: var(--accent-strong);
     font-size: 1.2rem;
     margin-bottom: 12px;
+    border: 1px solid var(--line);
 }
 
 .step-card h2,
@@ -492,6 +532,9 @@ button::after {
 .card-head h2 {
     margin: 0 0 10px;
     font-size: 1.5rem;
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .step-card p {
@@ -522,11 +565,14 @@ button::after {
 .jump-links a {
     text-decoration: none;
     padding: 16px;
-    border-radius: 18px;
+    border-radius: 8px;
     background: linear-gradient(180deg, var(--panel-highlight), transparent);
     border: 1px solid var(--line);
     font-weight: 700;
     line-height: 1.45;
+    font-size: 1.02rem;
+    font-family: var(--font-display);
+    letter-spacing: 0.03em;
 }
 
 .jump-links a:hover {
@@ -556,7 +602,7 @@ button::after {
 .calculator-card.is-active {
     border-color: var(--line-strong);
     box-shadow:
-        0 0 0 1px rgba(243, 139, 67, 0.12),
+        0 0 0 1px rgba(208, 192, 154, 0.14),
         0 28px 80px rgba(0, 0, 0, 0.3);
     transform: translateY(-6px) scale(1.01);
 }
@@ -565,7 +611,7 @@ button::after {
     transform: translateY(-8px);
     border-color: var(--line-strong);
     box-shadow:
-        0 0 0 1px rgba(243, 139, 67, 0.12),
+        0 0 0 1px rgba(208, 192, 154, 0.14),
         0 30px 68px rgba(0, 0, 0, 0.28);
 }
 
@@ -577,11 +623,13 @@ button::after {
     display: inline-block;
     margin: 6px 0 0;
     padding: 8px 10px;
-    border-radius: 999px;
-    background: var(--accent-soft);
+    border-radius: 6px;
+    background: rgba(208, 192, 154, 0.12);
     color: var(--accent-strong);
     font-size: 0.92rem;
     line-height: 1.45;
+    border: 1px solid rgba(208, 192, 154, 0.16);
+    letter-spacing: 0.04em;
 }
 
 .calculator-form {
@@ -604,9 +652,9 @@ button::after {
 .result-card {
     margin-top: 18px;
     padding: 18px;
-    border-radius: 20px;
+    border-radius: 10px;
     background:
-        linear-gradient(180deg, rgba(143, 36, 54, 0.18), rgba(208, 174, 117, 0.06)),
+        linear-gradient(180deg, rgba(208, 192, 154, 0.12), rgba(255, 255, 255, 0.02)),
         var(--surface-strong);
     border: 1px solid var(--line-strong);
     box-shadow: var(--shadow-soft);
@@ -641,6 +689,22 @@ button::after {
     gap: 16px;
     margin-top: 24px;
     padding: 18px 24px;
+}
+
+.topbar::after,
+.info-panel::after,
+.alert::after,
+.jump-links::after,
+.footer::after,
+.stat-card::after,
+.step-card::after,
+.jump-links a::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(208, 192, 154, 0.05);
+    border-radius: 4px;
+    pointer-events: none;
 }
 
 .has-js [data-reveal] {
@@ -703,7 +767,7 @@ button::after {
         box-shadow: var(--shadow-soft);
     }
     50% {
-        box-shadow: 0 18px 38px rgba(143, 36, 54, 0.22);
+        box-shadow: 0 18px 38px rgba(208, 192, 154, 0.14);
     }
 }
 

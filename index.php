@@ -86,7 +86,8 @@ function collect_country_codes(array $countries)
 
 $service = new InflationService(new WorldBankClient(__DIR__ . '/data'));
 $version = current_version(__DIR__ . '/VERSION');
-$assetVersion = rawurlencode($version);
+$cssAssetVersion = rawurlencode($version . '-' . (string) @filemtime(__DIR__ . '/assets/styles.css'));
+$jsAssetVersion = rawurlencode($version . '-' . (string) @filemtime(__DIR__ . '/assets/app.js'));
 $countries = $service->getCountries();
 $countryCodes = collect_country_codes($countries);
 $selectedCountry = strtoupper((string) request_value('country', 'GTM'));
@@ -156,6 +157,9 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inflación Mundial</title>
     <meta name="description" content="Calculadora PHP para estimar inflación y precios por país usando datos del Banco Mundial.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         (function () {
             var theme = 'dark';
@@ -171,7 +175,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
             document.documentElement.setAttribute('data-theme', theme);
         }());
     </script>
-    <link rel="stylesheet" href="assets/styles.css?v=<?= h($assetVersion) ?>">
+    <link rel="stylesheet" href="assets/styles.css?v=<?= h($cssAssetVersion) ?>">
 </head>
 <body data-active-calculator="<?= h($activeCalculator) ?>">
 <main class="shell">
@@ -474,6 +478,6 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
         <p>Versión activa: <?= h($version) ?>.</p>
     </footer>
 </main>
-<script src="assets/app.js?v=<?= h($assetVersion) ?>"></script>
+<script src="assets/app.js?v=<?= h($jsAssetVersion) ?>"></script>
 </body>
 </html>

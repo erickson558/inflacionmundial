@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3.0 - 2026-03-28
+
+- Rediseño más marcado del modo oscuro hacia una estética gótica sobria, menos vino y más piedra/obsidiana.
+- Tipografías nuevas para el modo oscuro con `Cinzel` y `Cormorant Garamond`.
+- Cache-busting de assets por fecha de modificación para forzar recarga real de estilos y scripts.
+
 ## v1.2.0 - 2026-03-28
 
 - Redirección visual del modo oscuro hacia una estética más gótica, con negro carbón, borgoña y dorado envejecido.
