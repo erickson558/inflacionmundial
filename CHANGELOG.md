@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.6.0 - 2026-03-28
+
+- Nueva Herramienta 5 para calcular un precio histórico equivalente desde el último año CPI disponible hacia un año pasado, por ejemplo 1996.
+- La app ahora permite hacer un cálculo de inflación reversiva sin recargar la página completa.
+- Textos de ayuda y navegación actualizados para reflejar que la app ya incluye cinco herramientas.
+
 ## v1.5.0 - 2026-03-28
 
 - Las herramientas de precio ahora muestran la unidad monetaria del país seleccionado, por ejemplo `GTQ / Q` para Guatemala.

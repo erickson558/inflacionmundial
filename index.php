@@ -203,6 +203,10 @@ function calculator_anchor($calculator)
         return 'calc-4';
     }
 
+    if ($calculator === 'past_price') {
+        return 'calc-5';
+    }
+
     return 'calc-1';
 }
 
@@ -305,6 +309,23 @@ function render_calculator_result($calculator, array $result, array $currency)
             </small>
         </div>
         <?php
+    } elseif ($calculator === 'past_price') {
+        ?>
+        <div class="result-card" role="status">
+            <p class="result-label">Precio equivalente en <?= h($result['targetYear']) ?></p>
+            <strong><?= h(format_money($result['pastPrice'], $currency)) ?></strong>
+            <p>
+                Un precio de <?= h(format_money($result['originalPrice'], $currency)) ?> en
+                <?= h($result['referenceYear']) ?> equivale a
+                <?= h(format_money($result['pastPrice'], $currency)) ?> en
+                <?= h($result['targetYear']) ?> para
+                <?= h($result['countryName']) ?>.
+            </p>
+            <small>
+                Variación acumulada al retroceder el período: <?= format_percent($result['accumulatedVariation']) ?>.
+            </small>
+        </div>
+        <?php
     }
 
     return trim((string) ob_get_clean());
@@ -381,6 +402,12 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
                 parse_decimal(post_value('current_price', '')),
                 (int) post_value('target_year_future_price', 0)
             );
+        } elseif ($calculator === 'past_price') {
+            $results['past_price'] = $service->calculatePastPrice(
+                $selectedCountry,
+                parse_decimal(post_value('present_price_reverse', '')),
+                (int) post_value('target_year_past_price', 0)
+            );
         } else {
             throw new InvalidArgumentException('No se seleccionó un cálculo válido.');
         }
@@ -408,6 +435,12 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
 $projectionMinYear = $context !== null ? ((int) $context['currentYear'] + 1) : ((int) date('Y') + 1);
 $projectionMaxYear = $context !== null ? (int) $context['projectionEndYear'] : ((int) date('Y') + 25);
 $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
+$pastComparisonYears = array_values(array_filter(
+    $comparisonYears,
+    function ($year) use ($context) {
+        return $context !== null && (int) $year < (int) $context['latestCpiYear'];
+    }
+));
 $currency = currency_details($context);
 $currencyShortLabel = currency_short_label($currency);
 $currencyFullLabel = currency_full_label($currency);
@@ -522,7 +555,7 @@ $currencyFullLabel = currency_full_label($currency);
         <article class="step-card">
             <span class="step-index">2</span>
             <h2>Escoge la pregunta</h2>
-            <p>Debajo tienes cuatro opciones claras: inflación futura, precio actual, inflación anual o precio futuro.</p>
+            <p>Debajo tienes cinco opciones claras: inflación futura, precio actual, inflación anual, precio futuro o precio histórico equivalente.</p>
         </article>
         <article class="step-card">
             <span class="step-index">3</span>
@@ -547,6 +580,7 @@ $currencyFullLabel = currency_full_label($currency);
         <a href="#calc-2">Quiero actualizar un precio viejo</a>
         <a href="#calc-3">Quiero ver la inflación de un año futuro</a>
         <a href="#calc-4">Quiero proyectar un precio futuro</a>
+        <a href="#calc-5">Quiero llevar un precio actual a un año pasado</a>
     </section>
 
     <section class="info-panel" data-reveal="6" style="--reveal-order: 6;">
@@ -682,6 +716,41 @@ $currencyFullLabel = currency_full_label($currency);
                 <button type="submit">Calcular precio futuro</button>
             </form>
             <div class="calculator-feedback" data-calculator-feedback="future_price" aria-live="polite"><?= render_calculator_feedback('future_price', $results, $calculatorErrors, $activeCalculator, $currency) ?></div>
+        </article>
+
+        <article id="calc-5" class="calculator-card <?= $activeCalculator === 'past_price' ? 'is-active' : '' ?>" data-calculator-card="past_price" data-reveal="11" style="--reveal-order: 11;">
+            <div class="card-head">
+                <p class="section-kicker">Herramienta 5</p>
+                <h2>Calcular un precio histórico equivalente</h2>
+                <p>Lleva un precio del último año CPI disponible hacia un año pasado, por ejemplo 1996.</p>
+                <p class="simple-tip">Úsalo para hacer un cálculo de inflación reversiva desde el valor más reciente disponible.</p>
+                <p class="currency-note">Unidad monetaria: <?= h($currencyFullLabel) ?>.</p>
+            </div>
+            <form method="post" action="<?= h(calculator_form_action($selectedCountry, 'calc-5')) ?>" class="calculator-form" data-calculator-form="past_price">
+                <input type="hidden" name="country" value="<?= h($selectedCountry) ?>">
+                <input type="hidden" name="calculator" value="past_price">
+                <label for="present_price_reverse">Precio del producto en el último año disponible (<?= h($currencyShortLabel) ?>)</label>
+                <input
+                    id="present_price_reverse"
+                    name="present_price_reverse"
+                    type="text"
+                    inputmode="decimal"
+                    placeholder="Ejemplo: 100.00"
+                    value="<?= h(post_value('present_price_reverse', '')) ?>"
+                    required
+                >
+                <label for="target_year_past_price">Año histórico al que quieres llevarlo</label>
+                <select id="target_year_past_price" name="target_year_past_price" required>
+                    <?php foreach ($pastComparisonYears as $year): ?>
+                        <option value="<?= h($year) ?>" <?= (string) $year === (string) post_value('target_year_past_price', '') ? 'selected' : '' ?>>
+                            <?= h($year) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <p class="field-note">Toma como punto de partida el último año CPI disponible del país, no necesariamente el año calendario actual.</p>
+                <button type="submit">Calcular precio histórico</button>
+            </form>
+            <div class="calculator-feedback" data-calculator-feedback="past_price" aria-live="polite"><?= render_calculator_feedback('past_price', $results, $calculatorErrors, $activeCalculator, $currency) ?></div>
         </article>
     </section>
 

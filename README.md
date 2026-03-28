@@ -8,6 +8,7 @@ La app cubre cuatro escenarios:
 2. Precio actual equivalente de un producto a partir de un precio histórico y un año base.
 3. Inflación estimada para un año futuro específico.
 4. Precio futuro estimado de un producto a partir de su precio actual y un año final.
+5. Precio histórico equivalente de un producto llevando un valor del último año CPI disponible hacia un año pasado.
 
 ## Fuente de datos
 
@@ -23,6 +24,7 @@ La app cubre cuatro escenarios:
 - Tipografía gótica conservada en modo oscuro y modo claro para mantener identidad visual.
 - Envío asíncrono en las calculadoras para mostrar resultados sin recargar toda la página.
 - Las herramientas de precio muestran la moneda del país en el formulario y en el resultado calculado.
+- Herramienta de inflación reversiva para estimar a cuánto equivaldría hoy un valor en un año histórico anterior.
 - Interfaz responsiva en una sola página.
 - Guía visual simple para que cualquier persona entienda el flujo.
 - Animaciones y efectos visuales para reforzar los resultados y la navegación.
@@ -68,6 +70,7 @@ Luego abre `http://127.0.0.1:8080`.
 ## Cómo calcula
 
 - El cálculo de "precio actual" convierte el precio al último año con CPI disponible en el snapshot local del país.
+- El cálculo de "precio histórico equivalente" hace el recorrido inverso: toma un valor del último año CPI disponible y lo lleva a un año pasado con datos.
 - Las herramientas de precio usan la moneda asociada al país para etiquetar entradas y resultados, por ejemplo `GTQ / Q`.
 - Las proyecciones futuras usan una mezcla entre:
   - Promedio de los últimos 10 años observados.

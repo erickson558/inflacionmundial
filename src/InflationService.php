@@ -105,6 +105,39 @@ final class InflationService
         );
     }
 
+    public function calculatePastPrice($countryCode, $price, $targetYear)
+    {
+        if ($price <= 0) {
+            throw new InvalidArgumentException('El precio debe ser mayor que cero.');
+        }
+
+        $context = $this->getCountryContext($countryCode);
+        $cpiSeries = $context['cpiSeries'];
+        $latestCpiYear = (int) $context['latestCpiYear'];
+
+        if (!isset($cpiSeries[$targetYear])) {
+            throw new InvalidArgumentException('El año histórico seleccionado no tiene datos de CPI disponibles.');
+        }
+
+        if ($targetYear >= $latestCpiYear) {
+            throw new InvalidArgumentException('El año histórico debe ser menor al último año CPI disponible.');
+        }
+
+        $latestCpiValue = (float) $context['latestCpiValue'];
+        $targetCpiValue = (float) $cpiSeries[$targetYear];
+        $factor = $targetCpiValue / $latestCpiValue;
+
+        return array(
+            'countryName' => $context['country']['name'],
+            'referenceYear' => $latestCpiYear,
+            'targetYear' => $targetYear,
+            'originalPrice' => $price,
+            'pastPrice' => $price * $factor,
+            'accumulatedVariation' => ($factor - 1) * 100,
+            'factor' => $factor,
+        );
+    }
+
     public function calculateFutureAccumulatedInflation($countryCode, $targetYear)
     {
         $context = $this->getCountryContext($countryCode);
