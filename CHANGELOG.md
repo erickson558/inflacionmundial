@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0 - 2026-03-28
+
+- Tema oscuro por defecto con cambio manual a modo claro y persistencia en el navegador.
+- Interfaz simplificada con guía rápida de 3 pasos y textos más directos para cada cálculo.
+- Nuevas animaciones y efectos visuales suaves para dar más claridad sin recargar la pantalla.
+
 ## v1.0.1 - 2026-03-28
 
 - Filtro del selector para mostrar solo países con series suficientes para calcular.

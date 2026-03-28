@@ -18,7 +18,9 @@ La app cubre cuatro escenarios:
 
 - Selector de países con snapshot local y series suficientes para calcular.
 - Snapshot local versionado en `data/` para que funcione incluso en PHP 5.4.
+- Modo oscuro por defecto con cambio manual a modo claro.
 - Interfaz responsiva en una sola página.
+- Guía visual simple para que cualquier persona entienda el flujo.
 - `VERSION` como fuente única de verdad para la versión de la app.
 - Release automático en GitHub al hacer push a `main`.
 
@@ -34,6 +36,7 @@ La app cubre cuatro escenarios:
 ```text
 .
 |-- .github/workflows/release.yml
+|-- assets/app.js
 |-- assets/styles.css
 |-- data/
 |-- index.php
