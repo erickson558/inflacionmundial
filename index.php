@@ -84,6 +84,161 @@ function collect_country_codes(array $countries)
     return $codes;
 }
 
+function is_ajax_request()
+{
+    if (isset($_POST['async']) && $_POST['async'] === '1') {
+        return true;
+    }
+
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+        return strtolower((string) $_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
+
+    return false;
+}
+
+function calculator_anchor($calculator)
+{
+    if ($calculator === 'future_accumulated') {
+        return 'calc-1';
+    }
+
+    if ($calculator === 'current_price') {
+        return 'calc-2';
+    }
+
+    if ($calculator === 'future_year_inflation') {
+        return 'calc-3';
+    }
+
+    if ($calculator === 'future_price') {
+        return 'calc-4';
+    }
+
+    return 'calc-1';
+}
+
+function calculator_form_action($countryCode, $anchor)
+{
+    $query = http_build_query(array('country' => $countryCode));
+
+    return ($query !== '' ? ('?' . $query) : '') . '#' . $anchor;
+}
+
+function render_calculator_error(array $errors)
+{
+    if (empty($errors)) {
+        return '';
+    }
+
+    ob_start();
+    ?>
+    <div class="inline-alert" role="alert">
+        <strong>No se pudo completar este cálculo.</strong>
+        <ul>
+            <?php foreach ($errors as $error): ?>
+                <li><?= h($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+    <?php
+
+    return trim((string) ob_get_clean());
+}
+
+function render_calculator_result($calculator, array $result)
+{
+    ob_start();
+
+    if ($calculator === 'future_accumulated') {
+        ?>
+        <div class="result-card" role="status">
+            <p class="result-label">Resultado estimado</p>
+            <strong><?= format_percent($result['accumulatedInflation']) ?></strong>
+            <p>
+                Entre <?= h($result['baseYear']) ?> y
+                <?= h($result['targetYear']) ?> la inflación acumulada estimada
+                para <?= h($result['countryName']) ?> es
+                <?= format_percent($result['accumulatedInflation']) ?>.
+            </p>
+            <small>
+                Promedio anual proyectado: <?= format_percent($result['projectedAverageRate']) ?>.
+                Modelo histórico: <?= h($result['modelStartYear']) ?>-<?= h($result['modelEndYear']) ?>.
+            </small>
+        </div>
+        <?php
+    } elseif ($calculator === 'current_price') {
+        ?>
+        <div class="result-card" role="status">
+            <p class="result-label">Precio equivalente</p>
+            <strong><?= format_number($result['currentPrice'], 2) ?></strong>
+            <p>
+                Un precio de <?= format_number($result['originalPrice'], 2) ?> en
+                <?= h($result['baseYear']) ?> equivale a
+                <?= format_number($result['currentPrice'], 2) ?> en
+                <?= h($result['latestCpiYear']) ?> para
+                <?= h($result['countryName']) ?>.
+            </p>
+            <small>
+                Inflación acumulada del período: <?= format_percent($result['accumulatedInflation']) ?>.
+            </small>
+        </div>
+        <?php
+    } elseif ($calculator === 'future_year_inflation') {
+        ?>
+        <div class="result-card" role="status">
+            <p class="result-label">Tasa proyectada</p>
+            <strong><?= format_percent($result['projectedRate']) ?></strong>
+            <p>
+                La inflación anual estimada para <?= h($result['targetYear']) ?>
+                en <?= h($result['countryName']) ?> es
+                <?= format_percent($result['projectedRate']) ?>.
+            </p>
+            <small>
+                Último dato oficial: <?= h($result['latestInflationYear']) ?>.
+                Promedio reciente: <?= format_percent($result['averageRecentInflation']) ?>.
+            </small>
+        </div>
+        <?php
+    } elseif ($calculator === 'future_price') {
+        ?>
+        <div class="result-card" role="status">
+            <p class="result-label">Precio proyectado</p>
+            <strong><?= format_number($result['futurePrice'], 2) ?></strong>
+            <p>
+                Un precio actual de <?= format_number($result['originalPrice'], 2) ?> podría
+                llegar a <?= format_number($result['futurePrice'], 2) ?> en
+                <?= h($result['targetYear']) ?> para
+                <?= h($result['countryName']) ?>.
+            </p>
+            <small>
+                Inflación acumulada estimada: <?= format_percent($result['accumulatedInflation']) ?>.
+                Modelo histórico: <?= h($result['modelStartYear']) ?>-<?= h($result['modelEndYear']) ?>.
+            </small>
+        </div>
+        <?php
+    }
+
+    return trim((string) ob_get_clean());
+}
+
+function render_calculator_feedback($calculator, array $results, array $errors, $activeCalculator)
+{
+    if ($activeCalculator !== $calculator) {
+        return '';
+    }
+
+    if (!empty($errors)) {
+        return render_calculator_error($errors);
+    }
+
+    if (!isset($results[$calculator])) {
+        return '';
+    }
+
+    return render_calculator_result($calculator, $results[$calculator]);
+}
+
 $service = new InflationService(new WorldBankClient(__DIR__ . '/data'));
 $version = current_version(__DIR__ . '/VERSION');
 $cssAssetVersion = rawurlencode($version . '-' . (string) @filemtime(__DIR__ . '/assets/styles.css'));
@@ -100,21 +255,21 @@ if (!in_array($selectedCountry, $countryCodes, true)) {
     }
 }
 
-$errors = array();
+$pageErrors = array();
+$calculatorErrors = array();
 $results = array();
 $context = null;
-$activeCalculator = '';
+$activeCalculator = (string) post_value('calculator', '');
 
 try {
     $context = $service->getCountryContext($selectedCountry);
 } catch (Exception $exception) {
-    $errors[] = $exception->getMessage();
+    $pageErrors[] = $exception->getMessage();
 }
 
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && $context !== null) {
     try {
-        $calculator = (string) post_value('calculator', '');
-        $activeCalculator = $calculator;
+        $calculator = $activeCalculator;
 
         if ($calculator === 'future_accumulated') {
             $results['future_accumulated'] = $service->calculateFutureAccumulatedInflation(
@@ -142,8 +297,23 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
             throw new InvalidArgumentException('No se seleccionó un cálculo válido.');
         }
     } catch (Exception $exception) {
-        $errors[] = $exception->getMessage();
+        $calculatorErrors[] = $exception->getMessage();
     }
+}
+
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && is_ajax_request()) {
+    $responseErrors = !empty($calculatorErrors) ? $calculatorErrors : $pageErrors;
+    $calculator = $activeCalculator !== '' ? $activeCalculator : 'future_accumulated';
+    $payload = array(
+        'ok' => empty($responseErrors) && isset($results[$calculator]),
+        'calculator' => $calculator,
+        'anchor' => calculator_anchor($calculator),
+        'feedbackHtml' => render_calculator_feedback($calculator, $results, $responseErrors, $calculator),
+    );
+
+    header('Content-Type: application/json; charset=UTF-8');
+    echo json_encode($payload);
+    exit;
 }
 
 $projectionMinYear = $context !== null ? ((int) $context['currentYear'] + 1) : ((int) date('Y') + 1);
@@ -269,11 +439,11 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
         </article>
     </section>
 
-    <?php if (!empty($errors)): ?>
+    <?php if (!empty($pageErrors)): ?>
         <section class="alert" data-reveal="4" style="--reveal-order: 4;">
             <strong>No se pudo completar el cálculo.</strong>
             <ul>
-                <?php foreach ($errors as $error): ?>
+                <?php foreach ($pageErrors as $error): ?>
                     <li><?= h($error) ?></li>
                 <?php endforeach; ?>
             </ul>
@@ -298,14 +468,14 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
     </section>
 
     <section class="calculator-grid">
-        <article id="calc-1" class="calculator-card <?= $activeCalculator === 'future_accumulated' ? 'is-active' : '' ?>" data-reveal="7" style="--reveal-order: 7;">
+        <article id="calc-1" class="calculator-card <?= $activeCalculator === 'future_accumulated' ? 'is-active' : '' ?>" data-calculator-card="future_accumulated" data-reveal="7" style="--reveal-order: 7;">
             <div class="card-head">
                 <p class="section-kicker">Herramienta 1</p>
                 <h2>Calcular la inflación futura acumulada</h2>
                 <p>Proyecta la inflación acumulada desde el año actual hasta un año futuro objetivo.</p>
                 <p class="simple-tip">Úsalo si quieres saber cuánto podrían subir los precios en total.</p>
             </div>
-            <form method="post" class="calculator-form">
+            <form method="post" action="<?= h(calculator_form_action($selectedCountry, 'calc-1')) ?>" class="calculator-form" data-calculator-form="future_accumulated">
                 <input type="hidden" name="country" value="<?= h($selectedCountry) ?>">
                 <input type="hidden" name="calculator" value="future_accumulated">
                 <label for="target_year_future_accumulated">Año futuro</label>
@@ -321,32 +491,17 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <p class="field-note">Solo debes indicar hasta qué año quieres proyectar.</p>
                 <button type="submit">Calcular inflación futura</button>
             </form>
-            <?php if (isset($results['future_accumulated'])): ?>
-                <div class="result-card" role="status">
-                    <p class="result-label">Resultado estimado</p>
-                    <strong><?= format_percent($results['future_accumulated']['accumulatedInflation']) ?></strong>
-                    <p>
-                        Entre <?= h($results['future_accumulated']['baseYear']) ?> y
-                        <?= h($results['future_accumulated']['targetYear']) ?> la inflación acumulada estimada
-                        para <?= h($results['future_accumulated']['countryName']) ?> es
-                        <?= format_percent($results['future_accumulated']['accumulatedInflation']) ?>.
-                    </p>
-                    <small>
-                        Promedio anual proyectado: <?= format_percent($results['future_accumulated']['projectedAverageRate']) ?>.
-                        Modelo histórico: <?= h($results['future_accumulated']['modelStartYear']) ?>-<?= h($results['future_accumulated']['modelEndYear']) ?>.
-                    </small>
-                </div>
-            <?php endif; ?>
+            <div class="calculator-feedback" data-calculator-feedback="future_accumulated" aria-live="polite"><?= render_calculator_feedback('future_accumulated', $results, $calculatorErrors, $activeCalculator) ?></div>
         </article>
 
-        <article id="calc-2" class="calculator-card <?= $activeCalculator === 'current_price' ? 'is-active' : '' ?>" data-reveal="8" style="--reveal-order: 8;">
+        <article id="calc-2" class="calculator-card <?= $activeCalculator === 'current_price' ? 'is-active' : '' ?>" data-calculator-card="current_price" data-reveal="8" style="--reveal-order: 8;">
             <div class="card-head">
                 <p class="section-kicker">Herramienta 2</p>
                 <h2>Calcular el precio actual de un producto</h2>
                 <p>Ingresa un precio histórico y compáralo contra el último CPI disponible del país.</p>
                 <p class="simple-tip">Úsalo si quieres traer un precio antiguo al valor más reciente disponible.</p>
             </div>
-            <form method="post" class="calculator-form">
+            <form method="post" action="<?= h(calculator_form_action($selectedCountry, 'calc-2')) ?>" class="calculator-form" data-calculator-form="current_price">
                 <input type="hidden" name="country" value="<?= h($selectedCountry) ?>">
                 <input type="hidden" name="calculator" value="current_price">
                 <label for="historic_price">Precio del producto</label>
@@ -370,32 +525,17 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <p class="field-note">Ejemplo: si en 2015 algo costaba 100, aquí puedes ver su equivalente actual.</p>
                 <button type="submit">Calcular precio actual</button>
             </form>
-            <?php if (isset($results['current_price'])): ?>
-                <div class="result-card" role="status">
-                    <p class="result-label">Precio equivalente</p>
-                    <strong><?= format_number($results['current_price']['currentPrice'], 2) ?></strong>
-                    <p>
-                        Un precio de <?= format_number($results['current_price']['originalPrice'], 2) ?> en
-                        <?= h($results['current_price']['baseYear']) ?> equivale a
-                        <?= format_number($results['current_price']['currentPrice'], 2) ?> en
-                        <?= h($results['current_price']['latestCpiYear']) ?> para
-                        <?= h($results['current_price']['countryName']) ?>.
-                    </p>
-                    <small>
-                        Inflación acumulada del período: <?= format_percent($results['current_price']['accumulatedInflation']) ?>.
-                    </small>
-                </div>
-            <?php endif; ?>
+            <div class="calculator-feedback" data-calculator-feedback="current_price" aria-live="polite"><?= render_calculator_feedback('current_price', $results, $calculatorErrors, $activeCalculator) ?></div>
         </article>
 
-        <article id="calc-3" class="calculator-card <?= $activeCalculator === 'future_year_inflation' ? 'is-active' : '' ?>" data-reveal="9" style="--reveal-order: 9;">
+        <article id="calc-3" class="calculator-card <?= $activeCalculator === 'future_year_inflation' ? 'is-active' : '' ?>" data-calculator-card="future_year_inflation" data-reveal="9" style="--reveal-order: 9;">
             <div class="card-head">
                 <p class="section-kicker">Herramienta 3</p>
                 <h2>Calcular la inflación en otro año futuro</h2>
                 <p>Entrega la tasa anual estimada para un año futuro específico.</p>
                 <p class="simple-tip">Úsalo si solo quieres conocer una tasa anual proyectada.</p>
             </div>
-            <form method="post" class="calculator-form">
+            <form method="post" action="<?= h(calculator_form_action($selectedCountry, 'calc-3')) ?>" class="calculator-form" data-calculator-form="future_year_inflation">
                 <input type="hidden" name="country" value="<?= h($selectedCountry) ?>">
                 <input type="hidden" name="calculator" value="future_year_inflation">
                 <label for="target_year_specific">Año futuro específico</label>
@@ -411,31 +551,17 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <p class="field-note">Ideal para comparar un año puntual, por ejemplo 2028 o 2030.</p>
                 <button type="submit">Calcular inflación anual</button>
             </form>
-            <?php if (isset($results['future_year_inflation'])): ?>
-                <div class="result-card" role="status">
-                    <p class="result-label">Tasa proyectada</p>
-                    <strong><?= format_percent($results['future_year_inflation']['projectedRate']) ?></strong>
-                    <p>
-                        La inflación anual estimada para <?= h($results['future_year_inflation']['targetYear']) ?>
-                        en <?= h($results['future_year_inflation']['countryName']) ?> es
-                        <?= format_percent($results['future_year_inflation']['projectedRate']) ?>.
-                    </p>
-                    <small>
-                        Último dato oficial: <?= h($results['future_year_inflation']['latestInflationYear']) ?>.
-                        Promedio reciente: <?= format_percent($results['future_year_inflation']['averageRecentInflation']) ?>.
-                    </small>
-                </div>
-            <?php endif; ?>
+            <div class="calculator-feedback" data-calculator-feedback="future_year_inflation" aria-live="polite"><?= render_calculator_feedback('future_year_inflation', $results, $calculatorErrors, $activeCalculator) ?></div>
         </article>
 
-        <article id="calc-4" class="calculator-card <?= $activeCalculator === 'future_price' ? 'is-active' : '' ?>" data-reveal="10" style="--reveal-order: 10;">
+        <article id="calc-4" class="calculator-card <?= $activeCalculator === 'future_price' ? 'is-active' : '' ?>" data-calculator-card="future_price" data-reveal="10" style="--reveal-order: 10;">
             <div class="card-head">
                 <p class="section-kicker">Herramienta 4</p>
                 <h2>Calcular el precio futuro de un producto</h2>
                 <p>Proyecta cuánto podría costar un producto en el año final que elijas.</p>
                 <p class="simple-tip">Úsalo si quieres estimar cuánto podría costar algo más adelante.</p>
             </div>
-            <form method="post" class="calculator-form">
+            <form method="post" action="<?= h(calculator_form_action($selectedCountry, 'calc-4')) ?>" class="calculator-form" data-calculator-form="future_price">
                 <input type="hidden" name="country" value="<?= h($selectedCountry) ?>">
                 <input type="hidden" name="calculator" value="future_price">
                 <label for="current_price">Precio actual del producto</label>
@@ -461,22 +587,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <p class="field-note">Ingresa el precio de hoy y el año final al que quieres llevarlo.</p>
                 <button type="submit">Calcular precio futuro</button>
             </form>
-            <?php if (isset($results['future_price'])): ?>
-                <div class="result-card" role="status">
-                    <p class="result-label">Precio proyectado</p>
-                    <strong><?= format_number($results['future_price']['futurePrice'], 2) ?></strong>
-                    <p>
-                        Un precio actual de <?= format_number($results['future_price']['originalPrice'], 2) ?> podría
-                        llegar a <?= format_number($results['future_price']['futurePrice'], 2) ?> en
-                        <?= h($results['future_price']['targetYear']) ?> para
-                        <?= h($results['future_price']['countryName']) ?>.
-                    </p>
-                    <small>
-                        Inflación acumulada estimada: <?= format_percent($results['future_price']['accumulatedInflation']) ?>.
-                        Modelo histórico: <?= h($results['future_price']['modelStartYear']) ?>-<?= h($results['future_price']['modelEndYear']) ?>.
-                    </small>
-                </div>
-            <?php endif; ?>
+            <div class="calculator-feedback" data-calculator-feedback="future_price" aria-live="polite"><?= render_calculator_feedback('future_price', $results, $calculatorErrors, $activeCalculator) ?></div>
         </article>
     </section>
 

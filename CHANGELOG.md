@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.2 - 2026-03-28
+
+- Las calculadoras ahora envían el cálculo de forma asíncrona y muestran el resultado dentro de la misma herramienta.
+- Se evita la recarga completa del sitio al calcular, manteniendo visible la tarjeta activa.
+- Se agregó fallback con anclas por herramienta para que, si falla JavaScript, el formulario vuelva al bloque correcto.
+
 ## v1.4.1 - 2026-03-28
 
 - Paleta del modo oscuro ajustada a negro con azul profundo para que el tema se sienta más frío y nocturno.

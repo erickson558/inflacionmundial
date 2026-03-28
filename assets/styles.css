@@ -578,6 +578,13 @@ button:hover {
     box-shadow: 0 18px 34px var(--button-glow);
 }
 
+button:disabled,
+button.is-loading {
+    cursor: wait;
+    opacity: 0.82;
+    transform: none;
+}
+
 button::after {
     content: "";
     position: absolute;
@@ -808,6 +815,36 @@ button::after {
 
 .calculator-form button {
     width: 100%;
+}
+
+.calculator-feedback {
+    margin-top: 18px;
+}
+
+.calculator-feedback:empty {
+    display: none;
+}
+
+.inline-alert {
+    padding: 16px 18px;
+    border: 1px solid rgba(215, 121, 103, 0.26);
+    background:
+        linear-gradient(180deg, rgba(215, 121, 103, 0.12), transparent),
+        var(--surface-strong);
+    box-shadow: var(--shadow-soft);
+}
+
+.inline-alert strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.inline-alert ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--ink-soft);
+    line-height: 1.55;
 }
 
 .result-card {
