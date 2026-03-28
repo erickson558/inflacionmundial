@@ -72,7 +72,7 @@ $inflationSeries = Build-SeriesMap -Rows $inflationPayload[1] -AllowedCountries 
 
 $metadata = [ordered]@{
     generatedAt               = (Get-Date).ToUniversalTime().ToString('o')
-    sourceLastUpdated         = [string]$countriesPayload[0].lastupdated
+    sourceLastUpdated         = [string]$cpiPayload[0].lastupdated
     countryCount              = $countries.Count
     cpiSeriesCountryCount     = $cpiSeries.Count
     inflationSeriesCountryCount = $inflationSeries.Count

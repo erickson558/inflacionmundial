@@ -16,7 +16,7 @@ La app cubre cuatro escenarios:
 
 ## Características
 
-- Selector de país con snapshot local de cobertura global.
+- Selector de países con snapshot local y series suficientes para calcular.
 - Snapshot local versionado en `data/` para que funcione incluso en PHP 5.4.
 - Interfaz responsiva en una sola página.
 - `VERSION` como fuente única de verdad para la versión de la app.

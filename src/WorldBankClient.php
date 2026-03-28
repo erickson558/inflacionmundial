@@ -24,7 +24,26 @@ final class WorldBankClient
 
     public function getCountries()
     {
-        return $this->readJsonFile('countries.json');
+        $countries = $this->readJsonFile('countries.json');
+        $cpiSeries = $this->readJsonFile('cpi.json');
+        $inflationSeries = $this->readJsonFile('inflation.json');
+        $supportedCountries = array();
+
+        foreach ($countries as $country) {
+            $countryCode = isset($country['id']) ? $country['id'] : '';
+
+            if (
+                $countryCode !== '' &&
+                isset($cpiSeries[$countryCode]) &&
+                !empty($cpiSeries[$countryCode]) &&
+                isset($inflationSeries[$countryCode]) &&
+                !empty($inflationSeries[$countryCode])
+            ) {
+                $supportedCountries[] = $country;
+            }
+        }
+
+        return $supportedCountries;
     }
 
     public function getIndicatorSeries($countryCode, $indicator)
