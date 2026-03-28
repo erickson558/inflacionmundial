@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.2 - 2026-03-28
+
+- Cambio de texto en las cards: `Tema` pasa a `Herramienta`.
+
 ## v1.1.1 - 2026-03-28
 
 - Animaciones y efectos visuales más notorios en botones, tarjetas y resultados.

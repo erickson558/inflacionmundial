@@ -289,7 +289,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
     <section class="calculator-grid">
         <article id="calc-1" class="calculator-card <?= $activeCalculator === 'future_accumulated' ? 'is-active' : '' ?>" data-reveal="7" style="--reveal-order: 7;">
             <div class="card-head">
-                <p class="section-kicker">Tema 1</p>
+                <p class="section-kicker">Herramienta 1</p>
                 <h2>Calcular la inflación futura acumulada</h2>
                 <p>Proyecta la inflación acumulada desde el año actual hasta un año futuro objetivo.</p>
                 <p class="simple-tip">Úsalo si quieres saber cuánto podrían subir los precios en total.</p>
@@ -330,7 +330,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
 
         <article id="calc-2" class="calculator-card <?= $activeCalculator === 'current_price' ? 'is-active' : '' ?>" data-reveal="8" style="--reveal-order: 8;">
             <div class="card-head">
-                <p class="section-kicker">Tema 2</p>
+                <p class="section-kicker">Herramienta 2</p>
                 <h2>Calcular el precio actual de un producto</h2>
                 <p>Ingresa un precio histórico y compáralo contra el último CPI disponible del país.</p>
                 <p class="simple-tip">Úsalo si quieres traer un precio antiguo al valor más reciente disponible.</p>
@@ -379,7 +379,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
 
         <article id="calc-3" class="calculator-card <?= $activeCalculator === 'future_year_inflation' ? 'is-active' : '' ?>" data-reveal="9" style="--reveal-order: 9;">
             <div class="card-head">
-                <p class="section-kicker">Tema 3</p>
+                <p class="section-kicker">Herramienta 3</p>
                 <h2>Calcular la inflación en otro año futuro</h2>
                 <p>Entrega la tasa anual estimada para un año futuro específico.</p>
                 <p class="simple-tip">Úsalo si solo quieres conocer una tasa anual proyectada.</p>
@@ -419,7 +419,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
 
         <article id="calc-4" class="calculator-card <?= $activeCalculator === 'future_price' ? 'is-active' : '' ?>" data-reveal="10" style="--reveal-order: 10;">
             <div class="card-head">
-                <p class="section-kicker">Tema 4</p>
+                <p class="section-kicker">Herramienta 4</p>
                 <h2>Calcular el precio futuro de un producto</h2>
                 <p>Proyecta cuánto podría costar un producto en el año final que elijas.</p>
                 <p class="simple-tip">Úsalo si quieres estimar cuánto podría costar algo más adelante.</p>
