@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.0 - 2026-03-28
+
+- Redirección visual del modo oscuro hacia una estética más gótica, con negro carbón, borgoña y dorado envejecido.
+- Fondos, paneles, botones y resultados ajustados para que el modo oscuro se sienta más solemne sin perder claridad.
+
 ## v1.1.2 - 2026-03-28
 
 - Cambio de texto en las cards: `Tema` pasa a `Herramienta`.

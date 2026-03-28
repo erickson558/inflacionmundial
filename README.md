@@ -18,7 +18,7 @@ La app cubre cuatro escenarios:
 
 - Selector de países con snapshot local y series suficientes para calcular.
 - Snapshot local versionado en `data/` para que funcione incluso en PHP 5.4.
-- Modo oscuro por defecto con cambio manual a modo claro.
+- Modo oscuro por defecto con cambio manual a modo claro y estética gótica sobria.
 - Interfaz responsiva en una sola página.
 - Guía visual simple para que cualquier persona entienda el flujo.
 - Animaciones y efectos visuales para reforzar los resultados y la navegación.
