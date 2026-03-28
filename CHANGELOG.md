@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.1 - 2026-03-28
+
+- Paleta del modo oscuro ajustada a negro con azul profundo para que el tema se sienta más frío y nocturno.
+- El modo claro conserva la tipografía gótica en títulos y texto base para mantener identidad visual entre ambos temas.
+
 ## v1.4.0 - 2026-03-28
 
 - Rediseño más fuerte del modo oscuro hacia una estética de catedral con vitrales, marcos angulares y fondo arquitectónico.
