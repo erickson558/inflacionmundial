@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.0 - 2026-03-28
+
+- Las herramientas de precio ahora muestran la unidad monetaria del país seleccionado, por ejemplo `GTQ / Q` para Guatemala.
+- Los resultados de precio se formatean con código o símbolo de moneda para que el valor calculado sea más claro.
+- El snapshot local ahora incluye `data/currencies.json` y el script de actualización también descarga metadatos de moneda por país.
+
 ## v1.4.2 - 2026-03-28
 
 - Las calculadoras ahora envían el cálculo de forma asíncrona y muestran el resultado dentro de la misma herramienta.

@@ -20,6 +20,94 @@ function format_percent($value)
     return format_number($value, 2) . '%';
 }
 
+function currency_details($context)
+{
+    if (
+        !is_array($context) ||
+        !isset($context['country']) ||
+        !is_array($context['country']) ||
+        !isset($context['country']['currency']) ||
+        !is_array($context['country']['currency'])
+    ) {
+        return array(
+            'code' => '',
+            'name' => '',
+            'symbol' => '',
+        );
+    }
+
+    return array(
+        'code' => isset($context['country']['currency']['code']) ? (string) $context['country']['currency']['code'] : '',
+        'name' => isset($context['country']['currency']['name']) ? (string) $context['country']['currency']['name'] : '',
+        'symbol' => isset($context['country']['currency']['symbol']) ? (string) $context['country']['currency']['symbol'] : '',
+    );
+}
+
+function currency_short_label(array $currency)
+{
+    $parts = array();
+
+    if (isset($currency['code']) && $currency['code'] !== '') {
+        $parts[] = $currency['code'];
+    }
+
+    if (
+        isset($currency['symbol']) &&
+        $currency['symbol'] !== '' &&
+        (!isset($currency['code']) || $currency['symbol'] !== $currency['code'])
+    ) {
+        $parts[] = $currency['symbol'];
+    }
+
+    if (empty($parts)) {
+        return 'moneda local';
+    }
+
+    return implode(' / ', $parts);
+}
+
+function currency_full_label(array $currency)
+{
+    $parts = array();
+
+    if (isset($currency['name']) && $currency['name'] !== '') {
+        $parts[] = $currency['name'];
+    }
+
+    if (isset($currency['code']) && $currency['code'] !== '') {
+        $parts[] = $currency['code'];
+    }
+
+    if (
+        isset($currency['symbol']) &&
+        $currency['symbol'] !== '' &&
+        (!isset($currency['code']) || $currency['symbol'] !== $currency['code'])
+    ) {
+        $parts[] = $currency['symbol'];
+    }
+
+    if (empty($parts)) {
+        return 'moneda local del país';
+    }
+
+    return implode(' · ', $parts);
+}
+
+function format_money($value, array $currency)
+{
+    $amount = format_number($value, 2);
+
+    if (isset($currency['symbol']) && $currency['symbol'] !== '') {
+        return $currency['symbol'] . ' ' . $amount;
+    }
+
+    if (isset($currency['code']) && $currency['code'] !== '') {
+        return $currency['code'] . ' ' . $amount;
+    }
+
+    return $amount;
+}
+
 function parse_decimal($value)
 {
     $normalized = preg_replace('/\s+/', '', trim((string) $value));
@@ -146,7 +234,7 @@ function render_calculator_error(array $errors)
     return trim((string) ob_get_clean());
 }
 
-function render_calculator_result($calculator, array $result)
+function render_calculator_result($calculator, array $result, array $currency)
 {
     ob_start();
 
@@ -170,12 +258,12 @@ function render_calculator_result($calculator, array $result)
     } elseif ($calculator === 'current_price') {
         ?>
         <div class="result-card" role="status">
-            <p class="result-label">Precio equivalente</p>
-            <strong><?= format_number($result['currentPrice'], 2) ?></strong>
+            <p class="result-label">Precio equivalente en <?= h(currency_short_label($currency)) ?></p>
+            <strong><?= h(format_money($result['currentPrice'], $currency)) ?></strong>
             <p>
-                Un precio de <?= format_number($result['originalPrice'], 2) ?> en
+                Un precio de <?= h(format_money($result['originalPrice'], $currency)) ?> en
                 <?= h($result['baseYear']) ?> equivale a
-                <?= format_number($result['currentPrice'], 2) ?> en
+                <?= h(format_money($result['currentPrice'], $currency)) ?> en
                 <?= h($result['latestCpiYear']) ?> para
                 <?= h($result['countryName']) ?>.
             </p>
@@ -203,11 +291,11 @@ function render_calculator_result($calculator, array $result)
     } elseif ($calculator === 'future_price') {
         ?>
         <div class="result-card" role="status">
-            <p class="result-label">Precio proyectado</p>
-            <strong><?= format_number($result['futurePrice'], 2) ?></strong>
+            <p class="result-label">Precio proyectado en <?= h(currency_short_label($currency)) ?></p>
+            <strong><?= h(format_money($result['futurePrice'], $currency)) ?></strong>
             <p>
-                Un precio actual de <?= format_number($result['originalPrice'], 2) ?> podría
-                llegar a <?= format_number($result['futurePrice'], 2) ?> en
+                Un precio actual de <?= h(format_money($result['originalPrice'], $currency)) ?> podría
+                llegar a <?= h(format_money($result['futurePrice'], $currency)) ?> en
                 <?= h($result['targetYear']) ?> para
                 <?= h($result['countryName']) ?>.
             </p>
@@ -222,7 +310,7 @@ function render_calculator_result($calculator, array $result)
     return trim((string) ob_get_clean());
 }
 
-function render_calculator_feedback($calculator, array $results, array $errors, $activeCalculator)
+function render_calculator_feedback($calculator, array $results, array $errors, $activeCalculator, array $currency)
 {
     if ($activeCalculator !== $calculator) {
         return '';
@@ -236,7 +324,7 @@ function render_calculator_feedback($calculator, array $results, array $errors, 
         return '';
     }
 
-    return render_calculator_result($calculator, $results[$calculator]);
+    return render_calculator_result($calculator, $results[$calculator], $currency);
 }
 
 $service = new InflationService(new WorldBankClient(__DIR__ . '/data'));
@@ -304,11 +392,12 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && is_ajax_request()) {
     $responseErrors = !empty($calculatorErrors) ? $calculatorErrors : $pageErrors;
     $calculator = $activeCalculator !== '' ? $activeCalculator : 'future_accumulated';
+    $currency = currency_details($context);
     $payload = array(
         'ok' => empty($responseErrors) && isset($results[$calculator]),
         'calculator' => $calculator,
         'anchor' => calculator_anchor($calculator),
-        'feedbackHtml' => render_calculator_feedback($calculator, $results, $responseErrors, $calculator),
+        'feedbackHtml' => render_calculator_feedback($calculator, $results, $responseErrors, $calculator, $currency),
     );
 
     header('Content-Type: application/json; charset=UTF-8');
@@ -319,6 +408,9 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
 $projectionMinYear = $context !== null ? ((int) $context['currentYear'] + 1) : ((int) date('Y') + 1);
 $projectionMaxYear = $context !== null ? (int) $context['projectionEndYear'] : ((int) date('Y') + 25);
 $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
+$currency = currency_details($context);
+$currencyShortLabel = currency_short_label($currency);
+$currencyFullLabel = currency_full_label($currency);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -491,7 +583,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <p class="field-note">Solo debes indicar hasta qué año quieres proyectar.</p>
                 <button type="submit">Calcular inflación futura</button>
             </form>
-            <div class="calculator-feedback" data-calculator-feedback="future_accumulated" aria-live="polite"><?= render_calculator_feedback('future_accumulated', $results, $calculatorErrors, $activeCalculator) ?></div>
+            <div class="calculator-feedback" data-calculator-feedback="future_accumulated" aria-live="polite"><?= render_calculator_feedback('future_accumulated', $results, $calculatorErrors, $activeCalculator, $currency) ?></div>
         </article>
 
         <article id="calc-2" class="calculator-card <?= $activeCalculator === 'current_price' ? 'is-active' : '' ?>" data-calculator-card="current_price" data-reveal="8" style="--reveal-order: 8;">
@@ -500,11 +592,12 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <h2>Calcular el precio actual de un producto</h2>
                 <p>Ingresa un precio histórico y compáralo contra el último CPI disponible del país.</p>
                 <p class="simple-tip">Úsalo si quieres traer un precio antiguo al valor más reciente disponible.</p>
+                <p class="currency-note">Unidad monetaria: <?= h($currencyFullLabel) ?>.</p>
             </div>
             <form method="post" action="<?= h(calculator_form_action($selectedCountry, 'calc-2')) ?>" class="calculator-form" data-calculator-form="current_price">
                 <input type="hidden" name="country" value="<?= h($selectedCountry) ?>">
                 <input type="hidden" name="calculator" value="current_price">
-                <label for="historic_price">Precio del producto</label>
+                <label for="historic_price">Precio del producto (<?= h($currencyShortLabel) ?>)</label>
                 <input
                     id="historic_price"
                     name="historic_price"
@@ -525,7 +618,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <p class="field-note">Ejemplo: si en 2015 algo costaba 100, aquí puedes ver su equivalente actual.</p>
                 <button type="submit">Calcular precio actual</button>
             </form>
-            <div class="calculator-feedback" data-calculator-feedback="current_price" aria-live="polite"><?= render_calculator_feedback('current_price', $results, $calculatorErrors, $activeCalculator) ?></div>
+            <div class="calculator-feedback" data-calculator-feedback="current_price" aria-live="polite"><?= render_calculator_feedback('current_price', $results, $calculatorErrors, $activeCalculator, $currency) ?></div>
         </article>
 
         <article id="calc-3" class="calculator-card <?= $activeCalculator === 'future_year_inflation' ? 'is-active' : '' ?>" data-calculator-card="future_year_inflation" data-reveal="9" style="--reveal-order: 9;">
@@ -551,7 +644,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <p class="field-note">Ideal para comparar un año puntual, por ejemplo 2028 o 2030.</p>
                 <button type="submit">Calcular inflación anual</button>
             </form>
-            <div class="calculator-feedback" data-calculator-feedback="future_year_inflation" aria-live="polite"><?= render_calculator_feedback('future_year_inflation', $results, $calculatorErrors, $activeCalculator) ?></div>
+            <div class="calculator-feedback" data-calculator-feedback="future_year_inflation" aria-live="polite"><?= render_calculator_feedback('future_year_inflation', $results, $calculatorErrors, $activeCalculator, $currency) ?></div>
         </article>
 
         <article id="calc-4" class="calculator-card <?= $activeCalculator === 'future_price' ? 'is-active' : '' ?>" data-calculator-card="future_price" data-reveal="10" style="--reveal-order: 10;">
@@ -560,11 +653,12 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <h2>Calcular el precio futuro de un producto</h2>
                 <p>Proyecta cuánto podría costar un producto en el año final que elijas.</p>
                 <p class="simple-tip">Úsalo si quieres estimar cuánto podría costar algo más adelante.</p>
+                <p class="currency-note">Unidad monetaria: <?= h($currencyFullLabel) ?>.</p>
             </div>
             <form method="post" action="<?= h(calculator_form_action($selectedCountry, 'calc-4')) ?>" class="calculator-form" data-calculator-form="future_price">
                 <input type="hidden" name="country" value="<?= h($selectedCountry) ?>">
                 <input type="hidden" name="calculator" value="future_price">
-                <label for="current_price">Precio actual del producto</label>
+                <label for="current_price">Precio actual del producto (<?= h($currencyShortLabel) ?>)</label>
                 <input
                     id="current_price"
                     name="current_price"
@@ -587,7 +681,7 @@ $comparisonYears = $context !== null ? $context['comparisonYears'] : array();
                 <p class="field-note">Ingresa el precio de hoy y el año final al que quieres llevarlo.</p>
                 <button type="submit">Calcular precio futuro</button>
             </form>
-            <div class="calculator-feedback" data-calculator-feedback="future_price" aria-live="polite"><?= render_calculator_feedback('future_price', $results, $calculatorErrors, $activeCalculator) ?></div>
+            <div class="calculator-feedback" data-calculator-feedback="future_price" aria-live="polite"><?= render_calculator_feedback('future_price', $results, $calculatorErrors, $activeCalculator, $currency) ?></div>
         </article>
     </section>
 

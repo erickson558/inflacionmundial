@@ -13,6 +13,7 @@ La app cubre cuatro escenarios:
 
 - Banco Mundial, indicador `FP.CPI.TOTL`: índice de precios al consumidor.
 - Banco Mundial, indicador `FP.CPI.TOTL.ZG`: inflación anual de precios al consumidor.
+- Rest Countries: código, nombre y símbolo de moneda para mostrar la unidad monetaria de cada país.
 
 ## Características
 
@@ -21,6 +22,7 @@ La app cubre cuatro escenarios:
 - Modo oscuro por defecto con cambio manual a modo claro y una paleta negro-azul de inspiración gótica.
 - Tipografía gótica conservada en modo oscuro y modo claro para mantener identidad visual.
 - Envío asíncrono en las calculadoras para mostrar resultados sin recargar toda la página.
+- Las herramientas de precio muestran la moneda del país en el formulario y en el resultado calculado.
 - Interfaz responsiva en una sola página.
 - Guía visual simple para que cualquier persona entienda el flujo.
 - Animaciones y efectos visuales para reforzar los resultados y la navegación.
@@ -66,6 +68,7 @@ Luego abre `http://127.0.0.1:8080`.
 ## Cómo calcula
 
 - El cálculo de "precio actual" convierte el precio al último año con CPI disponible en el snapshot local del país.
+- Las herramientas de precio usan la moneda asociada al país para etiquetar entradas y resultados, por ejemplo `GTQ / Q`.
 - Las proyecciones futuras usan una mezcla entre:
   - Promedio de los últimos 10 años observados.
   - Tendencia lineal sobre esos mismos años.
@@ -82,6 +85,7 @@ Ese script descarga de nuevo:
 - `data/countries.json`
 - `data/cpi.json`
 - `data/inflation.json`
+- `data/currencies.json`
 - `data/metadata.json`
 
 ## Versionado

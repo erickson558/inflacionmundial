@@ -800,6 +800,14 @@ button::after {
     letter-spacing: 0.04em;
 }
 
+.currency-note {
+    margin: 10px 0 0;
+    color: var(--accent-strong);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+}
+
 .calculator-form {
     display: grid;
     gap: 12px;

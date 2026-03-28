@@ -25,6 +25,7 @@ final class WorldBankClient
     public function getCountries()
     {
         $countries = $this->readJsonFile('countries.json');
+        $currencyMap = $this->readOptionalJsonFile('currencies.json');
         $cpiSeries = $this->readJsonFile('cpi.json');
         $inflationSeries = $this->readJsonFile('inflation.json');
         $supportedCountries = array();
@@ -39,6 +40,10 @@ final class WorldBankClient
                 isset($inflationSeries[$countryCode]) &&
                 !empty($inflationSeries[$countryCode])
             ) {
+                if (isset($currencyMap[$countryCode]) && is_array($currencyMap[$countryCode])) {
+                    $country['currency'] = $currencyMap[$countryCode];
+                }
+
                 $supportedCountries[] = $country;
             }
         }
@@ -77,6 +82,17 @@ final class WorldBankClient
         }
 
         throw new InvalidArgumentException('Indicador no soportado.');
+    }
+
+    private function readOptionalJsonFile($filename)
+    {
+        $path = $this->dataDir . DIRECTORY_SEPARATOR . $filename;
+
+        if (!is_file($path)) {
+            return array();
+        }
+
+        return $this->readJsonFile($filename);
     }
 
     private function readJsonFile($filename)
